@@ -54,22 +54,59 @@ namespace NinNinUplink
 
         private void MainForm_Shown(object sender, EventArgs e)
         {
-            if (this.ApiKeyTextBox.Text != "")
-                this.StartCheckBox.Focus();
+            if (Settings.Default.GamePath == null || !IsToSAtPath(Settings.Default.GamePath)) {
+                // Try auto detecting and guessing
+                var key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\Steam App 372000");
+                if (key == null)
+                    key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Steam App 372000");
+                if (key != null) {
+                    var val = key.GetValue("InstallLocation") as string;
+                    if (val != null && IsToSAtPath(val))
+                        this.m_tosPath = val;
+                }
+                if (this.m_tosPath == null) {
+                    key = Registry.CurrentUser.OpenSubKey(@"Software\Valve\Steam");
+                    if (key != null) {
+                        var val = key.GetValue("SteamPath") as string;
+                        if (val != null) {
+                            val = Path.Combine(Path.GetFullPath(val), @"SteamApps\common\TreeOfSavior");
+                            if (IsToSAtPath(val))
+                                this.m_tosPath = val;
+                        }
+                    }
+                }
+                if (this.m_tosPath == null) {
+                    var val = @"C:\Program Files (x86)\Steam\SteamApps\common\TreeOfSavior";
+                    if (IsToSAtPath(val))
+                        this.m_tosPath = val;
+                }
 
-            var found = false;
-            var key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Steam App 372000");
-            if (key != null) {
-                var val = key.GetValue("InstallLocation") as string;
-                if (val != null) {
-                    this.m_tosPath = val;
-                    found = true;
+                // Ask the user
+                if (this.m_tosPath == null) {
+                    var dialog = new FolderBrowserDialog();
+                    dialog.ShowNewFolderButton = false;
+                    dialog.Description = "Please point to your TreeOfSavior installation folder:";
+                    if (dialog.ShowDialog() == DialogResult.OK) {
+                        if (IsToSAtPath(dialog.SelectedPath))
+                            this.m_tosPath = dialog.SelectedPath;
+                    }
+                }
+
+                if (this.m_tosPath != null) {
+                    Settings.Default.GamePath = this.m_tosPath;
+                    Settings.Default.Save();
                 }
             }
-
-            if (!found) {
+            else {
+                this.m_tosPath = Settings.Default.GamePath;
+            }
+            
+            if (this.m_tosPath == null) {
                 MessageBox.Show("Can't find your ToS installation location!", "x.x", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 this.Close();
+            }
+            else if (this.ApiKeyTextBox.Text != "") {
+                this.StartCheckBox.Focus();
             }
         }
 
@@ -187,6 +224,11 @@ namespace NinNinUplink
         {
             Console.WriteLine(e.ToString());
             this.StopTail("Logfile error");
+        }
+
+        private static bool IsToSAtPath(string path)
+        {
+            return File.Exists(Path.Combine(path, @"release\Client_tos.exe"));
         }
     }
 }
