@@ -11,8 +11,8 @@ The online service is free for members of the Daijoubu team and friends.
 ## Installing and Running
 
 Go to the [releases](https://github.com/ScorpicSavior/NinNinUplink/releases)
-page on GitHub and download the zip bundle. Extract it into a folder anywhere
-you like. Then simply launch NinNinUplink.exe and see what happens ;-)
+page on GitHub and download the zip bundle (not the source code). Extract it into
+a folder anywhere you like. Then simply launch NinNinUplink.exe and see what happens ;-)
 
 The application will try to detect your Tree of Savior installation automatically,
 so you don't need to set the ToS folder yourself. If the auto-detection fails,
