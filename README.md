@@ -15,7 +15,8 @@ page on GitHub and download the zip bundle. Extract it into a folder anywhere
 you like. Then simply launch NinNinUplink.exe and see what happens ;-)
 
 The application will try to detect your Tree of Savior installation automatically,
-so you don't need to (and in fact cannot) set the ToS folder yourself.
+so you don't need to set the ToS folder yourself. If the auto-detection fails,
+you will be asked to point to the game folder.
 
 You will need your Nin-Nin API Key for anything to work. [Get it here](http://nin-nin.daijoubu.rocks/api-key).
 
